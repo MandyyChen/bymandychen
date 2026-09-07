@@ -88,13 +88,6 @@ a {
 	text-underline-offset: 2px;
 }
 
-.date {
-	margin: 0 0 0.5rem;
-	font-size: 1.6rem;
-	font-weight: 600;
-	color: #111;
-}
-
 .page h1 {
 	margin: 0 0 1.5rem;
 	font-size: 1.5rem;
@@ -104,6 +97,15 @@ a {
 
 .page p {
 	margin: 0 0 1rem;
+}
+
+.page ul {
+	margin: 0 0 1rem;
+	padding-left: 1.2em;
+}
+
+.page li {
+	margin: 0 0 0.5rem;
 }
 
 .photos {
@@ -209,10 +211,6 @@ a {
 	padding: 2.5rem 2.75rem;
 	font-size: clamp(1.6rem, 3.4vw, 2.4rem);
 	line-height: 1.4;
-}
-
-.folder .crumb-link {
-	font-size: inherit;
 }
 
 .folder h1 {

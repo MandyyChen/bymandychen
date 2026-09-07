@@ -5,7 +5,7 @@ import { Image } from 'astro:assets';
 import Page from '../layouts/Page.astro';
 
 const PORTFOLIO_URL = 'https://mandyychen.com';
-const CATEGORIES = ['hardware for people', 'visual thinking', 'memo'];
+const CATEGORIES = ['hardware for people', 'visual thinking', 'computer vision', 'memo'];
 const catId = (c: string) => 'cat-' + c.replace(/\s+/g, '-').toLowerCase();
 
 const entries = (await getCollection('diary')).sort(
@@ -21,9 +21,6 @@ const photosFor = (id: string) =>
 		.filter((k) => k.startsWith(`/src/content/diary/${id}/`))
 		.sort()
 		.map((k) => files[k].default);
-
-const fmt = (d: Date) =>
-	d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
 const rendered = await Promise.all(
 	entries.map(async (e) => ({
@@ -81,9 +78,7 @@ const misc = rendered.filter(({ e }) => !used.has(e.id));
 							<ul class="cat-list">
 								{f.list.map(({ e }) => (
 									<li>
-										<a href={`#${e.id}`}>
-											{fmt(e.data.date)} &mdash; {e.data.title ?? '—'}
-										</a>
+										<a href={`#${e.id}`}>{e.data.title ?? e.id}</a>
 									</li>
 								))}
 							</ul>
@@ -105,7 +100,6 @@ const misc = rendered.filter(({ e }) => !used.has(e.id));
 							<section class="spread" id={e.id}>
 								<article class="page">
 									<a class="crumb-link" href={`#${f.id}`}>&larr; {f.c}</a>
-									<p class="date">{fmt(e.data.date)}</p>
 									{e.data.title && <h1>{e.data.title}</h1>}
 									<Content />
 									{photos.length > 0 && (
@@ -131,7 +125,6 @@ const misc = rendered.filter(({ e }) => !used.has(e.id));
 								<a class="crumb-link" href="#_cover">
 									&larr; return home
 								</a>
-								<p class="date">{fmt(e.data.date)}</p>
 								{e.data.title && <h1>{e.data.title}</h1>}
 								<Content />
 								{photos.length > 0 && (
