@@ -31,26 +31,30 @@ a {
 	color: inherit;
 }
 
-/* ---------- horizontal reader: flip left / right ---------- */
-.reader {
+[hidden] {
+	display: none !important;
+}
+
+/* ---------- views: home / folder / reader, one at a time ---------- */
+.view {
 	position: fixed;
 	inset: 0;
+	overflow-y: auto;
+	background: #fff;
+}
+
+/* a reader is a horizontal "book" you flip left / right — no animation */
+.reader {
 	display: flex;
 	overflow-x: auto;
 	overflow-y: hidden;
 	scroll-snap-type: x mandatory;
-	scroll-behavior: smooth;
+	scroll-behavior: auto;
 	scrollbar-width: none;
 }
 
 .reader::-webkit-scrollbar {
 	display: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.reader {
-		scroll-behavior: auto;
-	}
 }
 
 .spread {
@@ -65,26 +69,21 @@ a {
 
 .page {
 	width: 100%;
-	max-width: 640px;
-	padding: 14vh 1.5rem 6rem;
+	max-width: none;
+	padding: 2.5rem 2.75rem 6rem;
 }
 
-.crumb {
-	display: flex;
-	justify-content: space-between;
-	align-items: baseline;
+/* back link — same treatment as "go to my portfolio →" */
+.crumb-link {
+	display: inline-block;
 	margin-bottom: 2.5rem;
-}
-
-/* same treatment as "go to my portfolio →" on the home page */
-.crumb a {
 	font-size: 1.6rem;
 	color: #111;
 	text-decoration: none;
 	white-space: nowrap;
 }
 
-.crumb a:hover {
+.crumb-link:hover {
 	text-decoration: underline;
 	text-underline-offset: 2px;
 }
@@ -136,7 +135,6 @@ a {
 	font-size: 24px;
 	color: #111;
 	opacity: 0.25;
-	transition: opacity 0.15s;
 	z-index: 5;
 }
 
@@ -152,24 +150,16 @@ a {
 	right: 0;
 }
 
-.nav[hidden] {
-	display: none;
-}
-
-/* ---------- cover / home ---------- */
-.cover {
-	display: block;
-	position: relative;
-}
-
+/* ---------- home ---------- */
 .cover::after {
 	content: "";
 	position: absolute;
-	right: 0;
-	bottom: 0;
-	width: min(460px, 44vw);
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: min(660px, 62vw);
 	aspect-ratio: 1449 / 1086;
-	background: url("/ascii-bg.png") right bottom / contain no-repeat;
+	background: url("/ascii-bg.png") center / contain no-repeat;
 	opacity: 0.55;
 	pointer-events: none;
 	z-index: 0;
@@ -213,19 +203,19 @@ a {
 	text-underline-offset: 2px;
 }
 
-/* ---------- category page ---------- */
-.catpage {
-	display: block;
-}
-
-.catpage .page {
+/* ---------- folder (a category's list of entries) ---------- */
+.folder .page {
 	max-width: none;
 	padding: 2.5rem 2.75rem;
 	font-size: clamp(1.6rem, 3.4vw, 2.4rem);
 	line-height: 1.4;
 }
 
-.catpage h1 {
+.folder .crumb-link {
+	font-size: inherit;
+}
+
+.folder h1 {
 	margin: 0 0 1em;
 	font-size: inherit;
 	font-weight: 600;
@@ -252,14 +242,10 @@ a {
 
 @media (max-width: 640px) {
 	.page {
-		padding-top: 8vh;
+		padding: 1.75rem 1.5rem 4rem;
 	}
 	.photos img {
 		width: calc(50% - 0.5rem);
-	}
-	.cover .page,
-	.catpage .page {
-		padding: 1.75rem 1.5rem;
 	}
 	.cover-top {
 		flex-direction: column;
@@ -271,8 +257,8 @@ a {
 		margin-left: 1.25em;
 	}
 	.cover::after {
-		width: 68vw;
-		opacity: 0.4;
+		width: 82vw;
+		opacity: 0.45;
 	}
 }
 

@@ -33,13 +33,22 @@ const rendered = await Promise.all(
 	})),
 );
 
-const inCategory = (c: string) =>
-	rendered.filter(({ e }) => (e.data.category ?? '').toLowerCase() === c.toLowerCase());
+// group entries into their category "folders"
+const used = new Set<string>();
+const folders = CATEGORIES.map((c) => {
+	const list = rendered.filter(
+		({ e }) => (e.data.category ?? '').toLowerCase() === c.toLowerCase(),
+	);
+	list.forEach(({ e }) => used.add(e.id));
+	return { c, id: catId(c), list };
+});
+const misc = rendered.filter(({ e }) => !used.has(e.id));
 ---
 
 <Page bleed>
-	<div class="reader">
-		<section class="spread cover" id="_cover">
+	<div class="views">
+		<!-- HOME -->
+		<section class="view cover" id="_cover">
 			<div class="page">
 				<div class="cover-top">
 					<div class="cover-head">
@@ -51,9 +60,9 @@ const inCategory = (c: string) =>
 
 				<ul class="cover-cats">
 					{
-						CATEGORIES.map((c) => (
+						folders.map((f) => (
 							<li>
-								<a href={`#${catId(c)}`}>{c}</a>
+								<a href={`#${f.id}`}>{f.c}</a>
 							</li>
 						))
 					}
@@ -61,140 +70,201 @@ const inCategory = (c: string) =>
 			</div>
 		</section>
 
+		<!-- FOLDER LISTS -->
 		{
-			CATEGORIES.map((c) => {
-				const list = inCategory(c);
-				return (
-					<section class="spread catpage" id={catId(c)}>
-						<div class="page">
-							<div class="crumb"><a href="#_cover">&larr; return home</a></div>
-							<h1>{c}</h1>
-							{list.length > 0 ? (
-								<ul class="cat-list">
-									{list.map(({ e }) => (
-										<li>
-											<a href={`#${e.id}`}>
-												{fmt(e.data.date)} &mdash; {e.data.title ?? '—'}
-											</a>
-										</li>
-									))}
-								</ul>
-							) : (
-								<p class="soon">coming soon</p>
-							)}
-						</div>
-					</section>
-				);
-			})
+			folders.map((f) => (
+				<section class="view folder" id={f.id} hidden>
+					<div class="page">
+						<a class="crumb-link" href="#_cover">&larr; return home</a>
+						<h1>{f.c}</h1>
+						{f.list.length > 0 ? (
+							<ul class="cat-list">
+								{f.list.map(({ e }) => (
+									<li>
+										<a href={`#${e.id}`}>
+											{fmt(e.data.date)} &mdash; {e.data.title ?? '—'}
+										</a>
+									</li>
+								))}
+							</ul>
+						) : (
+							<p class="soon">coming soon</p>
+						)}
+					</div>
+				</section>
+			))
+		}
+
+		<!-- ENTRY READERS: one horizontal "book" per folder -->
+		{
+			folders
+				.filter((f) => f.list.length > 0)
+				.map((f) => (
+					<div class="view reader" id={`reader-${f.id}`} hidden>
+						{f.list.map(({ e, Content, photos }) => (
+							<section class="spread" id={e.id}>
+								<article class="page">
+									<a class="crumb-link" href={`#${f.id}`}>&larr; {f.c}</a>
+									<p class="date">{fmt(e.data.date)}</p>
+									{e.data.title && <h1>{e.data.title}</h1>}
+									<Content />
+									{photos.length > 0 && (
+										<div class="photos">
+											{photos.map((img) => (
+												<Image src={img} alt="" width={480} />
+											))}
+										</div>
+									)}
+								</article>
+							</section>
+						))}
+					</div>
+				))
 		}
 
 		{
-			rendered.map(({ e, Content, photos }) => (
-				<section class="spread" id={e.id}>
-					<article class="page">
-						<div class="crumb">
-							<a href={e.data.category ? `#${catId(e.data.category)}` : '#_cover'}>
-								&larr; {e.data.category ?? 'return home'}
-							</a>
-						</div>
-						<p class="date">
-							{fmt(e.data.date)}
-							{e.data.place ? ` · ${e.data.place}` : ''}
-						</p>
-						{e.data.title && <h1>{e.data.title}</h1>}
-						<Content />
-						{photos.length > 0 && (
-							<div class="photos">
-								{photos.map((img) => (
-									<Image src={img} alt="" width={480} />
-								))}
-							</div>
-						)}
-					</article>
-				</section>
-			))
+			misc.length > 0 && (
+				<div class="view reader" id="reader-misc" hidden>
+					{misc.map(({ e, Content, photos }) => (
+						<section class="spread" id={e.id}>
+							<article class="page">
+								<a class="crumb-link" href="#_cover">
+									&larr; return home
+								</a>
+								<p class="date">{fmt(e.data.date)}</p>
+								{e.data.title && <h1>{e.data.title}</h1>}
+								<Content />
+								{photos.length > 0 && (
+									<div class="photos">
+										{photos.map((img) => (
+											<Image src={img} alt="" width={480} />
+										))}
+									</div>
+								)}
+							</article>
+						</section>
+					))}
+				</div>
+			)
 		}
 	</div>
 
 	<button class="nav prev" aria-label="Previous" hidden>&#8249;</button>
-	<button class="nav next" aria-label="Next">&#8250;</button>
+	<button class="nav next" aria-label="Next" hidden>&#8250;</button>
 </Page>
 
 <script>
-	const reader = document.querySelector<HTMLElement>('.reader');
-	if (reader) {
-		const spreads = Array.from(reader.querySelectorAll<HTMLElement>('.spread'));
-		const prev = document.querySelector<HTMLButtonElement>('.nav.prev');
-		const next = document.querySelector<HTMLButtonElement>('.nav.next');
-		let timer: number | undefined;
+	const views = Array.from(document.querySelectorAll<HTMLElement>('.view'));
+	const prev = document.querySelector<HTMLButtonElement>('.nav.prev');
+	const next = document.querySelector<HTMLButtonElement>('.nav.next');
 
-		const go = (dir: number) =>
-			reader.scrollBy({ left: dir * reader.clientWidth, behavior: 'smooth' });
-		const home = () => reader.scrollTo({ left: 0, behavior: 'smooth' });
+	let activeReader: HTMLElement | null = null;
 
-		addEventListener('keydown', (e) => {
-			if (e.key === 'ArrowRight' || e.key === 'PageDown') {
-				e.preventDefault();
-				go(1);
-			} else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-				e.preventDefault();
-				go(-1);
-			} else if (e.key === 'Escape' || e.key === 'Home') {
-				e.preventDefault();
-				home();
-			}
+	const instantScroll = (container: HTMLElement, el: HTMLElement) => {
+		const keep = container.style.scrollBehavior;
+		container.style.scrollBehavior = 'auto';
+		el.scrollIntoView({ inline: 'start', block: 'nearest' });
+		container.style.scrollBehavior = keep;
+	};
+
+	const spreadsIn = (r: HTMLElement) =>
+		Array.from(r.querySelectorAll<HTMLElement>('.spread'));
+
+	const updateNav = () => {
+		if (!activeReader) {
+			if (prev) prev.hidden = true;
+			if (next) next.hidden = true;
+			return;
+		}
+		const all = spreadsIn(activeReader);
+		const i = Math.round(activeReader.scrollLeft / activeReader.clientWidth);
+		if (prev) prev.hidden = i <= 0;
+		if (next) next.hidden = i >= all.length - 1;
+		const id = all[i]?.id;
+		if (id) history.replaceState(null, '', '#' + id);
+	};
+
+	// show the view for a given hash; entries resolve to their folder's reader
+	const route = () => {
+		const id = (location.hash || '').replace(/^#/, '') || '_cover';
+		let target = document.getElementById(id);
+		let entrySpread: HTMLElement | null = null;
+
+		if (target && target.classList.contains('spread')) {
+			entrySpread = target;
+			target = target.closest('.reader');
+		}
+		if (!target || !target.classList.contains('view')) {
+			target = document.getElementById('_cover');
+		}
+
+		views.forEach((v) => {
+			v.hidden = v !== target;
 		});
-		next?.addEventListener('click', () => go(1));
-		prev?.addEventListener('click', () => go(-1));
 
-		const jumpTo = (el: HTMLElement, instant = false) => {
-			if (instant) {
-				const prev = reader.style.scrollBehavior;
-				reader.style.scrollBehavior = 'auto';
-				el.scrollIntoView({ inline: 'start' });
-				reader.style.scrollBehavior = prev;
-			} else {
-				el.scrollIntoView({ inline: 'start', behavior: 'smooth' });
+		if (target && target.classList.contains('reader')) {
+			activeReader = target;
+			const first = spreadsIn(target)[0];
+			instantScroll(target, entrySpread ?? first);
+		} else {
+			activeReader = null;
+		}
+		updateNav();
+		window.scrollTo(0, 0);
+	};
+
+	const flip = (dir: number) => {
+		if (!activeReader) return;
+		activeReader.scrollBy({ left: dir * activeReader.clientWidth });
+	};
+
+	const goHome = () => {
+		if (location.hash) history.pushState(null, '', location.pathname);
+		route();
+	};
+
+	addEventListener('keydown', (e) => {
+		if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+			if (activeReader) {
+				e.preventDefault();
+				flip(1);
 			}
-		};
-
-		// every in-page link turns to that page smoothly
-		reader.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
-			a.addEventListener('click', (ev) => {
-				const t = document.getElementById(a.getAttribute('href')!.slice(1));
-				if (t) {
-					ev.preventDefault();
-					jumpTo(t);
-				}
-			});
-		});
-
-		const sync = () => {
-			const i = Math.round(reader.scrollLeft / reader.clientWidth);
-			if (prev) prev.hidden = i <= 0;
-			if (next) next.hidden = i >= spreads.length - 1;
-			const id = spreads[i]?.id;
-			history.replaceState(
-				null,
-				'',
-				id && id !== '_cover' ? '#' + id : location.pathname,
-			);
-		};
-		reader.addEventListener(
-			'scroll',
-			() => {
-				clearTimeout(timer);
-				timer = window.setTimeout(sync, 90);
-			},
-			{ passive: true },
-		);
-
-		requestAnimationFrame(() => {
-			if (location.hash) {
-				const t = document.getElementById(location.hash.slice(1));
-				if (t) jumpTo(t, true);
+		} else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+			if (activeReader) {
+				e.preventDefault();
+				flip(-1);
 			}
-			sync();
+		} else if (e.key === 'Escape') {
+			e.preventDefault();
+			goHome();
+		}
+	});
+
+	next?.addEventListener('click', () => flip(1));
+	prev?.addEventListener('click', () => flip(-1));
+
+	// links change the hash; router (via hashchange) swaps the view instantly
+	document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
+		a.addEventListener('click', (ev) => {
+			ev.preventDefault();
+			const href = a.getAttribute('href')!;
+			if (href === location.hash) route();
+			else location.hash = href;
 		});
-	}
+	});
+
+	addEventListener('hashchange', route);
+
+	let scrollTimer: number | undefined;
+	document.addEventListener(
+		'scroll',
+		(e) => {
+			if (!activeReader || e.target !== activeReader) return;
+			clearTimeout(scrollTimer);
+			scrollTimer = window.setTimeout(updateNav, 90);
+		},
+		{ capture: true, passive: true },
+	);
+
+	route();
 </script>
