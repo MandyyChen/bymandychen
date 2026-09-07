@@ -67,7 +67,7 @@ const inCategory = (c: string) =>
 				return (
 					<section class="spread catpage" id={catId(c)}>
 						<div class="page">
-							<div class="crumb"><a href="#_cover">&larr; home</a></div>
+							<div class="crumb"><a href="#_cover">&larr; return home</a></div>
 							<h1>{c}</h1>
 							{list.length > 0 ? (
 								<ul class="cat-list">
@@ -93,8 +93,8 @@ const inCategory = (c: string) =>
 				<section class="spread" id={e.id}>
 					<article class="page">
 						<div class="crumb">
-							<a href="#_cover">&larr; home</a>
-							<span>{i + 1} / {entries.length}</span>
+							<a href="#_cover">&larr; return home</a>
+							<span class="count">{i + 1} / {entries.length}</span>
 						</div>
 						<p class="date">
 							{fmt(e.data.date)}

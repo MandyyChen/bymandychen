@@ -74,19 +74,26 @@ a {
 	justify-content: space-between;
 	align-items: baseline;
 	margin-bottom: 2.5rem;
-	font-size: 12px;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: #888;
 }
 
+/* same treatment as "go to my portfolio →" on the home page */
 .crumb a {
+	font-size: 1.05rem;
+	color: #111;
 	text-decoration: none;
+	white-space: nowrap;
 }
 
 .crumb a:hover {
 	text-decoration: underline;
 	text-underline-offset: 2px;
+}
+
+.crumb .count {
+	font-size: 12px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: #888;
 }
 
 .date {
