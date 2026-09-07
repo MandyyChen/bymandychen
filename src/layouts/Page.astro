@@ -1,0 +1,35 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import { SITE_TITLE, SITE_DESCRIPTION, GITHUB_URL } from '../consts';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const { title, description = SITE_DESCRIPTION } = Astro.props;
+const fullTitle = title ? `${title} — ${SITE_TITLE}` : SITE_TITLE;
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={fullTitle} description={description} />
+	</head>
+	<body>
+		<header class="site">
+			<a href="/">{SITE_TITLE}</a>
+			<span>{SITE_DESCRIPTION}</span>
+		</header>
+
+		<main>
+			<slot />
+		</main>
+
+		<footer class="site">
+			<span>&copy; {year} mandy chen</span>
+			<a href={GITHUB_URL}>source</a>
+		</footer>
+	</body>
+</html>

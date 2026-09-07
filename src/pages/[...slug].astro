@@ -1,0 +1,125 @@
+---
+import type { ImageMetadata } from 'astro';
+import { getCollection, render } from 'astro:content';
+import Page from '../layouts/Page.astro';
+import Scatter from '../components/Scatter.astro';
+
+export async function getStaticPaths() {
+	const entries = await getCollection('diary');
+	return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+// Photos co-located in src/content/diary/<slug>/, sorted by filename.
+const files = import.meta.glob<{ default: ImageMetadata }>(
+	'/src/content/diary/*/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP}',
+	{ eager: true },
+);
+const prefix = `/src/content/diary/${entry.id}/`;
+const photos = Object.keys(files)
+	.filter((k) => k.startsWith(prefix))
+	.sort()
+	.map((k) => files[k].default);
+
+const dateLabel = entry.data.date.toLocaleDateString('en-US', {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+});
+const hasPhotos = photos.length > 0;
+---
+
+<Page title={entry.data.title ?? dateLabel} description={entry.data.title ?? 'a diary entry'}>
+	<article class="entry">
+		<header class="meta">
+			<span>{dateLabel}</span>
+			{entry.data.place && <span>{entry.data.place}</span>}
+		</header>
+
+		<div class:list={['body', { solo: !hasPhotos }]}>
+			<div class="text">
+				{entry.data.title && <h1>{entry.data.title}</h1>}
+				<Content />
+			</div>
+			{hasPhotos && <Scatter seed={entry.id} photos={photos} />}
+		</div>
+
+		<p class="back"><a href="/">&larr; index</a></p>
+	</article>
+</Page>
+
+<style>
+	.meta {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		border-top: 1px solid var(--rule);
+		border-bottom: 1px solid var(--rule);
+		padding: 6px 0;
+		margin-bottom: 2.4rem;
+		font: 500 12px/1 var(--mono);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.body {
+		display: grid;
+		grid-template-columns: minmax(0, 40%) 1fr;
+		gap: 2.5rem;
+		align-items: start;
+	}
+
+	.body.solo {
+		grid-template-columns: 1fr;
+	}
+
+	.body.solo .text {
+		max-width: 62ch;
+		margin: 0 auto;
+	}
+
+	.text {
+		font-size: 0.98rem;
+		line-height: 1.7;
+		text-align: justify;
+		hyphens: auto;
+	}
+
+	.text h1 {
+		margin: 0 0 1rem;
+		font-size: 1.5rem;
+		line-height: 1.15;
+		font-weight: 400;
+		text-align: left;
+	}
+
+	.text :global(p) {
+		margin: 0 0 1rem;
+	}
+
+	.text :global(p:first-of-type::first-letter) {
+		font-size: 2.6rem;
+		line-height: 0.8;
+		float: left;
+		padding: 4px 6px 0 0;
+	}
+
+	.back {
+		margin-top: 3rem;
+		font: 500 12px/1 var(--mono);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	@media (max-width: 760px) {
+		.body {
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+		.text {
+			text-align: left;
+		}
+	}
+</style>

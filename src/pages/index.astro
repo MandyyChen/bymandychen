@@ -1,0 +1,66 @@
+---
+import { getCollection } from 'astro:content';
+import Page from '../layouts/Page.astro';
+
+const entries = (await getCollection('diary')).sort(
+	(a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const fmt = (d: Date) =>
+	d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<Page>
+	<ul class="entries">
+		{
+			entries.map((e) => (
+				<li>
+					<a href={`/${e.id}/`}>
+						<span class="d">{fmt(e.data.date)}</span>
+						<span class="t">{e.data.title ?? '—'}</span>
+						{e.data.place && <span class="p">{e.data.place}</span>}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</Page>
+
+<style>
+	.entries {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.entries li {
+		border-bottom: 1px solid var(--hairline);
+	}
+	.entries a {
+		display: grid;
+		grid-template-columns: 12rem 1fr auto;
+		gap: 1.5rem;
+		align-items: baseline;
+		padding: 1.1rem 0;
+		text-decoration: none;
+	}
+	.entries a:hover .t {
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+	.d,
+	.p {
+		font: 500 12px/1.4 var(--mono);
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--muted);
+	}
+	.t {
+		font-size: 1.35rem;
+	}
+	@media (max-width: 620px) {
+		.entries a {
+			grid-template-columns: 1fr;
+			gap: 0.3rem;
+		}
+	}
+</style>
