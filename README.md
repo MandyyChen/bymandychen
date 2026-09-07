@@ -1,41 +1,51 @@
 # bymandychen
 
-My internet diary / garden. A small [Astro](https://astro.build) site: each
-entry is one Markdown file, photos are auto-scattered and joined by a
-hand-drawn-looking thread.
+My internet diary / digital diary. An [Astro](https://astro.build) site.
+Everything lives on one horizontal "book" you flip through left / right:
+
+```
+[ home ]  →  [ hardware for people ]  [ visual thinking ]  [ memo ]  →  [ entry ]  [ entry ] …
+```
+
+- **Home** — name, link to the portfolio, the three category links.
+- **Category page** — lists every entry in that category as a link; says
+  "coming soon" if there are none yet.
+- **Entry** — one diary post.
+
+Navigate: `←` / `→` keys, on-screen `‹` `›`, swipe, or `Esc` for home.
 
 ## Add an entry
 
-1. Create `src/content/diary/YYYY-MM-DD-some-slug.md`:
+Create `src/content/diary/YYYY-MM-DD-some-slug.md`:
 
-   ```markdown
-   ---
-   date: 2026-09-06
-   title: a walk to the river   # optional
-   place: new haven             # optional
-   ---
+```markdown
+---
+date: 2026-09-06
+title: a walk to the river          # optional
+place: new haven                    # optional
+category: hardware for people       # optional — hardware for people | visual thinking | memo
+---
 
-   Write the entry here in plain paragraphs.
-   ```
+Write the entry in plain paragraphs.
+```
 
-2. (Optional) Add photos: make a folder with the **same name as the file**
-   minus `.md`, and drop images in it. Prefix filenames to set the order.
+Photos (optional): make a folder with the **same name as the file minus
+`.md`** and drop images in it; prefix filenames to set the order.
 
-   ```
-   src/content/diary/2026-09-06-a-walk-to-the-river.md
-   src/content/diary/2026-09-06-a-walk-to-the-river/
-     ├── 01-front-door.jpg
-     ├── 02-the-underpass.jpg
-     └── 03-the-river.jpg
-   ```
+```
+src/content/diary/2026-09-06-a-walk-to-the-river.md
+src/content/diary/2026-09-06-a-walk-to-the-river/
+  ├── 01-front-door.jpg
+  └── 02-the-river.jpg
+```
 
-That's it. The entry shows up on the home page (newest first) and gets its
-own page at `/2026-09-06-a-walk-to-the-river/`. No photos is fine — the
-text just runs full width.
+The entry appears in its category page and gets a slot in the book,
+newest first. `/2026-09-06-a-walk-to-the-river/` redirects to it.
 
-The scatter layout is deterministic: the same entry always lays out the
-same way. Layout maths live in `src/lib/scatter.ts` if you want to tweak
-the spread, tilt, or photo size.
+## Categories
+
+The list is `CATEGORIES` at the top of `src/pages/index.astro`. An entry
+joins a category via its `category:` frontmatter (exact text match).
 
 ## Local dev
 
@@ -47,24 +57,20 @@ npm run build    # output in dist/
 
 ## Deploy
 
-Hosted on Vercel — it builds `npm run build` and serves `dist/` on every
-push to `main`. Set the site URL in `astro.config.mjs` (`site:`) once the
-domain is known.
+Vercel builds `npm run build` and serves `dist/` on every push to `main`.
+Set the real URL in `astro.config.mjs` (`site:`) once the domain is known.
 
 ## Structure
 
 ```
 src/
-├── content/diary/      # entries (.md) + their photo folders
-├── content.config.ts   # entry frontmatter schema
-├── layouts/Page.astro  # header / footer shell
-├── components/
-│   ├── BaseHead.astro
-│   └── Scatter.astro   # scattered photos + connecting thread
-├── lib/scatter.ts      # deterministic placement + path maths
+├── content/diary/      # entries (.md) + photo folders
+├── content.config.ts   # frontmatter schema
+├── layouts/Page.astro  # <head> + body shell
+├── components/BaseHead.astro
 ├── pages/
-│   ├── index.astro     # the list
-│   └── [...slug].astro # one entry
-├── styles/global.css
-└── consts.ts           # site title / description / links
+│   ├── index.astro     # the whole book + its keyboard/scroll logic
+│   └── [...slug].astro # /slug/ -> /#slug redirect
+├── styles/global.css   # all styles (Inter, black on white)
+└── consts.ts           # site title / description
 ```

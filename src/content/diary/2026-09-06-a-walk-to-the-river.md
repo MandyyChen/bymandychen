@@ -2,6 +2,7 @@
 date: 2026-09-06
 title: a walk to the river
 place: new haven
+category: hardware for people
 ---
 
 Left the house without deciding where I was going, which is the only way

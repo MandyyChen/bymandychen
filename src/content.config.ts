@@ -9,6 +9,7 @@ const diary = defineCollection({
 		date: z.coerce.date(), // required: "2026-09-06"
 		title: z.string().optional(), // optional headline
 		place: z.string().optional(), // optional location note
+		category: z.string().optional(), // "hardware for people" | "visual thinking" | "memo"
 	}),
 });
 

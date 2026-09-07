@@ -1,66 +1,199 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
 import Page from '../layouts/Page.astro';
+
+const PORTFOLIO_URL = 'https://mandyychen.com';
+const CATEGORIES = ['hardware for people', 'visual thinking', 'memo'];
+const catId = (c: string) => 'cat-' + c.replace(/\s+/g, '-').toLowerCase();
 
 const entries = (await getCollection('diary')).sort(
 	(a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
 
+const files = import.meta.glob<{ default: ImageMetadata }>(
+	'/src/content/diary/*/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP}',
+	{ eager: true },
+);
+const photosFor = (id: string) =>
+	Object.keys(files)
+		.filter((k) => k.startsWith(`/src/content/diary/${id}/`))
+		.sort()
+		.map((k) => files[k].default);
+
 const fmt = (d: Date) =>
 	d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+const rendered = await Promise.all(
+	entries.map(async (e) => ({
+		e,
+		Content: (await render(e)).Content,
+		photos: photosFor(e.id),
+	})),
+);
+
+const inCategory = (c: string) =>
+	rendered.filter(({ e }) => (e.data.category ?? '').toLowerCase() === c.toLowerCase());
 ---
 
-<Page>
-	<ul class="entries">
+<Page bleed>
+	<div class="reader">
+		<section class="spread cover" id="_cover">
+			<div class="page">
+				<div class="cover-top">
+					<div class="cover-head">
+						<div>by mandy chen</div>
+						<div>digital diary</div>
+					</div>
+					<a class="cover-portfolio" href={PORTFOLIO_URL}>go to my portfolio &rarr;</a>
+				</div>
+
+				<ul class="cover-cats">
+					{
+						CATEGORIES.map((c) => (
+							<li>
+								<a href={`#${catId(c)}`}>{c}</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</section>
+
 		{
-			entries.map((e) => (
-				<li>
-					<a href={`/${e.id}/`}>
-						<span class="d">{fmt(e.data.date)}</span>
-						<span class="t">{e.data.title ?? '—'}</span>
-						{e.data.place && <span class="p">{e.data.place}</span>}
-					</a>
-				</li>
+			CATEGORIES.map((c) => {
+				const list = inCategory(c);
+				return (
+					<section class="spread catpage" id={catId(c)}>
+						<div class="page">
+							<div class="crumb"><a href="#_cover">&larr; home</a></div>
+							<h1>{c}</h1>
+							{list.length > 0 ? (
+								<ul class="cat-list">
+									{list.map(({ e }) => (
+										<li>
+											<a href={`#${e.id}`}>
+												{fmt(e.data.date)} &mdash; {e.data.title ?? '—'}
+											</a>
+										</li>
+									))}
+								</ul>
+							) : (
+								<p class="soon">coming soon</p>
+							)}
+						</div>
+					</section>
+				);
+			})
+		}
+
+		{
+			rendered.map(({ e, Content, photos }, i) => (
+				<section class="spread" id={e.id}>
+					<article class="page">
+						<div class="crumb">
+							<a href="#_cover">&larr; home</a>
+							<span>{i + 1} / {entries.length}</span>
+						</div>
+						<p class="date">
+							{fmt(e.data.date)}
+							{e.data.place ? ` · ${e.data.place}` : ''}
+						</p>
+						{e.data.title && <h1>{e.data.title}</h1>}
+						<Content />
+						{photos.length > 0 && (
+							<div class="photos">
+								{photos.map((img) => (
+									<Image src={img} alt="" width={480} />
+								))}
+							</div>
+						)}
+					</article>
+				</section>
 			))
 		}
-	</ul>
+	</div>
+
+	<button class="nav prev" aria-label="Previous" hidden>&#8249;</button>
+	<button class="nav next" aria-label="Next">&#8250;</button>
 </Page>
 
-<style>
-	.entries {
-		list-style: none;
-		margin: 0;
-		padding: 0;
+<script>
+	const reader = document.querySelector<HTMLElement>('.reader');
+	if (reader) {
+		const spreads = Array.from(reader.querySelectorAll<HTMLElement>('.spread'));
+		const prev = document.querySelector<HTMLButtonElement>('.nav.prev');
+		const next = document.querySelector<HTMLButtonElement>('.nav.next');
+		let timer: number | undefined;
+
+		const go = (dir: number) =>
+			reader.scrollBy({ left: dir * reader.clientWidth, behavior: 'smooth' });
+		const home = () => reader.scrollTo({ left: 0, behavior: 'smooth' });
+
+		addEventListener('keydown', (e) => {
+			if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+				e.preventDefault();
+				go(1);
+			} else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+				e.preventDefault();
+				go(-1);
+			} else if (e.key === 'Escape' || e.key === 'Home') {
+				e.preventDefault();
+				home();
+			}
+		});
+		next?.addEventListener('click', () => go(1));
+		prev?.addEventListener('click', () => go(-1));
+
+		const jumpTo = (el: HTMLElement, instant = false) => {
+			if (instant) {
+				const prev = reader.style.scrollBehavior;
+				reader.style.scrollBehavior = 'auto';
+				el.scrollIntoView({ inline: 'start' });
+				reader.style.scrollBehavior = prev;
+			} else {
+				el.scrollIntoView({ inline: 'start', behavior: 'smooth' });
+			}
+		};
+
+		// every in-page link turns to that page smoothly
+		reader.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
+			a.addEventListener('click', (ev) => {
+				const t = document.getElementById(a.getAttribute('href')!.slice(1));
+				if (t) {
+					ev.preventDefault();
+					jumpTo(t);
+				}
+			});
+		});
+
+		const sync = () => {
+			const i = Math.round(reader.scrollLeft / reader.clientWidth);
+			if (prev) prev.hidden = i <= 0;
+			if (next) next.hidden = i >= spreads.length - 1;
+			const id = spreads[i]?.id;
+			history.replaceState(
+				null,
+				'',
+				id && id !== '_cover' ? '#' + id : location.pathname,
+			);
+		};
+		reader.addEventListener(
+			'scroll',
+			() => {
+				clearTimeout(timer);
+				timer = window.setTimeout(sync, 90);
+			},
+			{ passive: true },
+		);
+
+		requestAnimationFrame(() => {
+			if (location.hash) {
+				const t = document.getElementById(location.hash.slice(1));
+				if (t) jumpTo(t, true);
+			}
+			sync();
+		});
 	}
-	.entries li {
-		border-bottom: 1px solid var(--hairline);
-	}
-	.entries a {
-		display: grid;
-		grid-template-columns: 12rem 1fr auto;
-		gap: 1.5rem;
-		align-items: baseline;
-		padding: 1.1rem 0;
-		text-decoration: none;
-	}
-	.entries a:hover .t {
-		text-decoration: underline;
-		text-underline-offset: 3px;
-	}
-	.d,
-	.p {
-		font: 500 12px/1.4 var(--mono);
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--muted);
-	}
-	.t {
-		font-size: 1.35rem;
-	}
-	@media (max-width: 620px) {
-		.entries a {
-			grid-template-columns: 1fr;
-			gap: 0.3rem;
-		}
-	}
-</style>
+</script>
