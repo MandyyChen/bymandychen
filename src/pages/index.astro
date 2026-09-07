@@ -5,12 +5,13 @@ import { Image } from 'astro:assets';
 import Page from '../layouts/Page.astro';
 
 const PORTFOLIO_URL = 'https://mandyychen.com';
-const CATEGORIES = ['hardware for people', 'visual thinking', 'computer vision', 'memo'];
+const CATEGORIES = ['hardware for people', 'visual thinking', 'computer vision', 'thoughts', 'memo'];
+const CLICKABLE = new Set(['hardware for people', 'memo']);
 const catId = (c: string) => 'cat-' + c.replace(/\s+/g, '-').toLowerCase();
 
 // a folder can show a fixed note instead of an entry list
 const FOLDER_TEXT: Record<string, string> = {
-	memo: 'welcome to one of my internet homes, happy to have you here! i created this to document my learnings and experiment with hyperlinks on the infinite link.',
+	memo: 'welcome to one of my internet homes, happy to have you here! i created this to document my learnings and experiment with hyperlinks on the infinite web.',
 };
 
 const entries = (await getCollection('diary')).sort(
@@ -54,8 +55,8 @@ const misc = rendered.filter(({ e }) => !used.has(e.id));
 			<div class="page">
 				<div class="cover-top">
 					<div class="cover-head">
-						<div>by mandy chen</div>
-						<div>digital diary</div>
+						<div>@bymandychen</div>
+						<div>digital diary 2026</div>
 					</div>
 					<a class="cover-portfolio" href={PORTFOLIO_URL}>go to my portfolio &rarr;</a>
 				</div>
@@ -64,7 +65,11 @@ const misc = rendered.filter(({ e }) => !used.has(e.id));
 					{
 						folders.map((f) => (
 							<li>
-								<a href={`#${f.id}`}>{f.c}</a>
+								{CLICKABLE.has(f.c) ? (
+									<a href={`#${f.id}`}>{f.c}</a>
+								) : (
+									<span>{f.c}</span>
+								)}
 							</li>
 						))
 					}

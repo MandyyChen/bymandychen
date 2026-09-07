@@ -1,76 +1,41 @@
 # bymandychen
 
-My internet diary / digital diary. An [Astro](https://astro.build) site.
-Everything lives on one horizontal "book" you flip through left / right:
+My internet diary. [Astro](https://astro.build), black on white, Inter.
 
-```
-[ home ]  →  [ hardware for people ]  [ visual thinking ]  [ memo ]  →  [ entry ]  [ entry ] …
-```
-
-- **Home** — name, link to the portfolio, the three category links.
-- **Category page** — lists every entry in that category as a link; says
-  "coming soon" if there are none yet.
-- **Entry** — one diary post.
-
-Navigate: `←` / `→` keys, on-screen `‹` `›`, swipe, or `Esc` for home.
+**Home → folder → entry.** The home page lists categories; a category
+("folder") lists its entries; an entry is one post. `←` `→` (or swipe)
+flip between entries in a folder. No animations.
 
 ## Add an entry
 
-Create `src/content/diary/YYYY-MM-DD-some-slug.md`:
+`src/content/diary/<slug>.md`:
 
 ```markdown
 ---
 date: 2026-09-06
-title: a walk to the river          # optional
-place: new haven                    # optional
-category: hardware for people       # optional — hardware for people | visual thinking | memo
+title: week 1                  # optional
+category: hardware for people  # optional — must match a name in CATEGORIES
 ---
 
-Write the entry in plain paragraphs.
+Body text here.
 ```
 
-Photos (optional): make a folder with the **same name as the file minus
-`.md`** and drop images in it; prefix filenames to set the order.
-
-```
-src/content/diary/2026-09-06-a-walk-to-the-river.md
-src/content/diary/2026-09-06-a-walk-to-the-river/
-  ├── 01-front-door.jpg
-  └── 02-the-river.jpg
-```
-
-The entry appears in its category page and gets a slot in the book,
-newest first. `/2026-09-06-a-walk-to-the-river/` redirects to it.
+Photos: a folder named exactly `<slug>/` next to the file; drop images
+in, prefix `01-`, `02-` for order.
 
 ## Categories
 
-The list is `CATEGORIES` at the top of `src/pages/index.astro`. An entry
-joins a category via its `category:` frontmatter (exact text match).
+Edit `CATEGORIES` at the top of `src/pages/index.astro`. `CLICKABLE` is
+the subset that links from the home page. `FOLDER_TEXT` gives a folder a
+fixed blurb instead of an entry list.
 
-## Local dev
+## Dev / deploy
 
 ```sh
 npm install
-npm run dev      # http://localhost:4321
-npm run build    # output in dist/
+npm run dev      # localhost:4321
+npm run build    # -> dist/
 ```
 
-## Deploy
-
-Vercel builds `npm run build` and serves `dist/` on every push to `main`.
-Set the real URL in `astro.config.mjs` (`site:`) once the domain is known.
-
-## Structure
-
-```
-src/
-├── content/diary/      # entries (.md) + photo folders
-├── content.config.ts   # frontmatter schema
-├── layouts/Page.astro  # <head> + body shell
-├── components/BaseHead.astro
-├── pages/
-│   ├── index.astro     # the whole book + its keyboard/scroll logic
-│   └── [...slug].astro # /slug/ -> /#slug redirect
-├── styles/global.css   # all styles (Inter, black on white)
-└── consts.ts           # site title / description
-```
+Vercel builds and deploys on every push to `main`. Set the real URL in
+`astro.config.mjs` once known.
