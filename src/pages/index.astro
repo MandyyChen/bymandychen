@@ -89,12 +89,13 @@ const inCategory = (c: string) =>
 		}
 
 		{
-			rendered.map(({ e, Content, photos }, i) => (
+			rendered.map(({ e, Content, photos }) => (
 				<section class="spread" id={e.id}>
 					<article class="page">
 						<div class="crumb">
-							<a href="#_cover">&larr; return home</a>
-							<span class="count">{i + 1} / {entries.length}</span>
+							<a href={e.data.category ? `#${catId(e.data.category)}` : '#_cover'}>
+								&larr; {e.data.category ?? 'return home'}
+							</a>
 						</div>
 						<p class="date">
 							{fmt(e.data.date)}
