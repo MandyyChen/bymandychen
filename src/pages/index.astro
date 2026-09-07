@@ -8,6 +8,11 @@ const PORTFOLIO_URL = 'https://mandyychen.com';
 const CATEGORIES = ['hardware for people', 'visual thinking', 'computer vision', 'memo'];
 const catId = (c: string) => 'cat-' + c.replace(/\s+/g, '-').toLowerCase();
 
+// a folder can show a fixed note instead of an entry list
+const FOLDER_TEXT: Record<string, string> = {
+	memo: 'welcome to one of my internet homes, happy to have you here! i created this to document my learnings and experiment with hyperlinks on the infinite link.',
+};
+
 const entries = (await getCollection('diary')).sort(
 	(a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
@@ -82,6 +87,8 @@ const misc = rendered.filter(({ e }) => !used.has(e.id));
 									</li>
 								))}
 							</ul>
+						) : FOLDER_TEXT[f.c] ? (
+							<p class="folder-note">{FOLDER_TEXT[f.c]}</p>
 						) : (
 							<p class="soon">coming soon</p>
 						)}

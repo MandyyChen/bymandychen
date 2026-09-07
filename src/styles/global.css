@@ -221,9 +221,10 @@ a {
 }
 
 .cat-list {
+	list-style: none;
 	margin: 0;
-	padding-left: 2em;
-	list-style: disc;
+	padding: 0;
+	margin-left: 2em;
 }
 
 .cat-list li {
@@ -241,6 +242,11 @@ a {
 	color: #888;
 	text-decoration: underline;
 	text-underline-offset: 2px;
+}
+
+.folder-note {
+	margin: 0 0 0 2em;
+	max-width: 40rem;
 }
 
 @media (max-width: 640px) {
