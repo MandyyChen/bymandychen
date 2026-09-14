@@ -22,17 +22,39 @@ const files = import.meta.glob<{ default: ImageMetadata }>(
 	'/src/content/diary/*/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP}',
 	{ eager: true },
 );
-const photosFor = (id: string) =>
-	Object.keys(files)
-		.filter((k) => k.startsWith(`/src/content/diary/${id}/`))
-		.sort()
-		.map((k) => files[k].default);
+// clips sit in the same folder as the photos; <name>.poster.jpg is its still
+const clips = import.meta.glob<{ default: string }>('/src/content/diary/*/*.mp4', {
+	eager: true,
+	query: '?url',
+	import: 'default',
+});
+
+// photos and clips share one filename ordering, so 02.mp4 falls between 01 and 03
+const mediaFor = (id: string) => {
+	const dir = `/src/content/diary/${id}/`;
+	const mine = (o: Record<string, unknown>) =>
+		Object.keys(o).filter((k) => k.startsWith(dir));
+	const items = [
+		...mine(files)
+			// posters are the clips' stills, not gallery photos of their own
+			.filter((k) => !k.includes('.poster.'))
+			.map((k) => ({ key: k, type: 'photo' as const, img: files[k].default })),
+		...mine(clips).map((k) => ({
+			key: k,
+			type: 'clip' as const,
+			src: clips[k] as unknown as string,
+			poster: (files[k.replace(/\.mp4$/, '.poster.jpg')] as { default: ImageMetadata } | undefined)
+				?.default.src,
+		})),
+	];
+	return items.sort((a, b) => a.key.localeCompare(b.key));
+};
 
 const rendered = await Promise.all(
 	entries.map(async (e) => ({
 		e,
 		Content: (await render(e)).Content,
-		photos: photosFor(e.id),
+		photos: mediaFor(e.id),
 	})),
 );
 
@@ -116,9 +138,21 @@ const misc = rendered.filter(({ e }) => !used.has(e.id));
 									<Content />
 									{photos.length > 0 && (
 										<div class="photos">
-											{photos.map((img) => (
-												<Image src={img} alt="" width={480} />
-											))}
+											{photos.map((m) =>
+												m.type === 'clip' ? (
+													<video
+														src={m.src}
+														poster={m.poster}
+														muted
+														loop
+														playsinline
+														autoplay
+														preload="metadata"
+													/>
+												) : (
+													<Image src={m.img} alt="" width={480} />
+												),
+											)}
 										</div>
 									)}
 								</article>
@@ -141,9 +175,21 @@ const misc = rendered.filter(({ e }) => !used.has(e.id));
 								<Content />
 								{photos.length > 0 && (
 									<div class="photos">
-										{photos.map((img) => (
-											<Image src={img} alt="" width={480} />
-										))}
+										{photos.map((m) =>
+											m.type === 'clip' ? (
+												<video
+													src={m.src}
+													poster={m.poster}
+													muted
+													loop
+													playsinline
+													autoplay
+													preload="metadata"
+												/>
+											) : (
+												<Image src={m.img} alt="" width={480} />
+											),
+										)}
 									</div>
 								)}
 							</article>
