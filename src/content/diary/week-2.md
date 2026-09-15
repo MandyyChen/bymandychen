@@ -8,7 +8,8 @@ this week, we learned how to solder at the ceid and how to tell a good joint fro
 i hadn't soldered in almost 5 years so it was a great refresh. we received our xiao esp32-c6 and
 soldered on the header pins as the takehome assignment. i definitely did not do a great job and
 used so much solder that it looks like cake frosting, but none of the joints are bridging so it
-should still function correctly.
+should still function correctly. after that i downloaded the arduino ide and installed the esp32
+board package so i could plug the xiao in over usb-c and get the ide talking to it.
 
 i'm definitely excited to start breadboarding, since for homework we went through the labs on
 components, breadboards, and electronics. a lot of components like the servo motor and dc motor
