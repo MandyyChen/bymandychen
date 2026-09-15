@@ -78,7 +78,8 @@ const misc = rendered.filter(({ e }) => !used.has(e.id));
 				<div class="cover-top">
 					<div class="cover-head">
 						<div>@bymandychen</div>
-						<div>digital diary 2026</div>
+						{/* second line intentionally blank; nbsp holds the cover's spacing */}
+						<div aria-hidden="true">&nbsp;</div>
 					</div>
 					<a class="cover-portfolio" href={PORTFOLIO_URL}>go to my portfolio &rarr;</a>
 				</div>
