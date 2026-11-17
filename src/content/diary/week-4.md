@@ -130,3 +130,16 @@ void loop() {
 ### reflection
 
 the biggest thing i learned: a switch is really just two conductive contacts brought together by an action. once that clicked, the physical form could change while the electronics stayed almost identical. the pressure pad, the flap, and the button all feel different in your hand but give the xiao the exact same kind of input.
+
+### reading: the design of implicit interactions (ju & leifer, 2008)
+
+ju and leifer start with a doorman. a good doorman doesn't wait for you to ask. he reads your approach and opens the door. their argument is that interactive systems should behave more like that, and less like something that constantly demands your attention.
+
+they map interactions on two axes:
+
+- attention: foreground (you're focused on it) vs. background (it happens at the edge of your awareness)
+- initiative: reactive (you start it) vs. proactive (the system starts it)
+
+an automatic door is the easy example: background and proactive. you never "use" it, you just walk through.
+
+this made my make-your-own-switch assignment click in hindsight. stepping on a doormat isn't operating a device, it's just coming home. the switch hides inside an action you'd do anyway. the challenge is the part they warn about: a proactive system that guesses wrong gets obnoxious fast, so implicit doesn't mean invisible, it still has to be readable.

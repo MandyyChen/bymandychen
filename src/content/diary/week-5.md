@@ -52,3 +52,11 @@ copper contacts were also finicky. the tape either touches by accident or misses
 ### final result
 
 a tiny ritual of coming home. the house starts dark. you step on the mat, ring the bell, knock, and the window lights up. it was interesting to see the exact same circuit from last week feel completely different once it lived inside an object and had a story.
+
+### reading: making interactive art: set the stage, then shut up and listen (tom igoe)
+
+igoe's rule for interactive work: don't explain it. if you have to tell people what to do and how to feel, the piece isn't doing its job. instead, set the stage (give people things to touch and hints about what to do with them), then step back and watch what they actually do. he compares it to a director with actors: you can't tell them what to feel, you can only set up the conditions.
+
+the "listen" half is what i want to get better at. people's confusion and misreadings aren't failure, they're the feedback.
+
+with the coming home house, the objects do most of the stage-setting. nobody needs instructions to step on a mat or ring a bell. the part i'd normally want to explain is the order (mat → bell → knock), and this reading made me wonder if the house should give a small signal after each step so people know they're on the right track without me saying anything.

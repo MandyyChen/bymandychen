@@ -16,3 +16,10 @@ today, we went to ceid, did makerspace onboarding, training and closed with a in
 i like the concept of norman doors. perhaps if we make enough norman doors, it eliminates all bad designs until we find the right one.
 or it'll lay the foundations of what NOT to do. i'll continuing messing around with this idea.
 
+### reading: the design of everyday things, ch. 1 (don norman)
+
+norman's first chapter is a field guide to why everyday things confuse us. two ideas stuck with me: discoverability (can i tell what actions are possible?) and understanding (what does any of it mean?). he breaks that down into affordances, signifiers, mapping, feedback, and conceptual models.
+
+the norman door is the classic example. a door that needs a "push" sign has already failed, because the handle is saying "pull." the form is talking over the label.
+
+what i'm taking into this class: with hardware, i'm designing the signifiers from scratch. a breadboard has zero signifiers for anyone who isn't me. if i want someone to press, step on, or squeeze something, the form has to say so before any instruction does.
