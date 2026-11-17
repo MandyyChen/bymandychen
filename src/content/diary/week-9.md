@@ -6,7 +6,7 @@ category: hardware for people
 
 ## week 9: wear the screen
 
-### symposium
+### symposium day
 
 presented my symposium on nov 2: fashion × hardware technology. the full write-up has its own post.
 
