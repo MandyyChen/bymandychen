@@ -8,15 +8,7 @@ category: hardware for people
 
 ### symposium
 
-i presented my symposium, *wear the screen*, on fashion hardware and wearable displays.
-
-for the demo, i turned lilygo t-display boards (an esp32 with a tiny color screen built in) into hair clips, each powered by a small 3.7v lipo battery. each clip joins wi-fi and shows its ip address, and a web page i built called **say it!** lets you type what you want to say and send it to each clip.
-
-your status doesn't have to look like a status.
-
-- display 01: HEY I THINK
-- display 02: YOU'RE CUTE
-- display 03: SOCIAL BATTERY 20%
+presented my symposium on nov 2: fashion × hardware technology. the full write-up has its own post.
 
 ### wi-fi
 
