@@ -52,6 +52,10 @@ once all four are activated, the lights inside the house turn on.
 i liked this direction because the interaction and output are directly connected: 
 completing the routine literally makes the house light up.
 
+### analog input lab
+
+before the switches, i did the analog input lab: a potentiometer and a photoresistor wired to the xiao, with leds on the breadboard.
+
 ## the build — three ways to make a switch
 
 i ended up building three switches with a seeed studio xiao esp32c6, cardboard, copper tape, jumper wires, an led, and a breadboard. first i got a single led working on D3 (through a resistor to ground), then built and tested each switch one at a time.

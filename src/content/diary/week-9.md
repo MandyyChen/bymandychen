@@ -12,7 +12,7 @@ presented my symposium on nov 2: fashion × hardware technology. the full write-
 
 ### wi-fi
 
-caught up on the lab connecting the esp to wi-fi.
+caught up on the lab connecting the esp to wi-fi, with a photoresistor and an led on the breadboard.
 
 ### are.na: interactive installations
 
