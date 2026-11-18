@@ -12,6 +12,10 @@ before building any electronics, i made a rough lightstick out of cardboard, tap
 
 i also used ai to generate a cleaner technical diagram from my sketch: globe, mvm logo insert, handle with an inner decorative insert, power button, usb-c port, battery cap, strap hole, and a wrist strap.
 
+### prototype v2
+
+for class, i made two lightsticks so i could test the interactions between sticks: black paper rolled into handles, with wax paper globes over pink and white fillers to diffuse the light.
+
 ### testing
 
 i had people listen to music while holding it.
